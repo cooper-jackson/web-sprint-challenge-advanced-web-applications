@@ -1,25 +1,53 @@
-import React, { useEffect } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
-const Login = () => {
+const Login = (props) => {
   // make a post request to retrieve a token from the api
   // when you have handled the token, navigate to the BubblePage route
+
+  const [credentials, setCredentials] = useState({})
+  const [error, setError] = useState(false)
+
 
   useEffect(()=>{
     // make a post request to retrieve a token from the api
     // when you have handled the token, navigate to the BubblePage route
   });
-  
-  const error = "";
-  //replace with error state
+
+  const handleChange = e => {
+    setCredentials ({
+      ...credentials, [e.target.name]: e.target.value
+    })
+  }
+
+  const onSubmit = () => {
+    console.log(credentials)
+    axios.post(`http://localhost:5000/api/login`, credentials)
+    .then(res => {
+      console.log(res)
+      localStorage.setItem("token", res.data.payload)
+      props.history.push('/bubbles')
+      setError('')
+    })
+    .catch(err => {
+      console.log(err)
+      setError(err.response.data.error)
+    })
+  }
 
   return (
     <div>
       <h1>Welcome to the Bubble App!</h1>
       <div data-testid="loginForm" className="login-form">
-        <h2>Build login form here</h2>
+        <h2>Username</h2>
+        <input type="text" name="username" data-testid="username" onChange={handleChange}></input>
+        <h2>Password</h2>
+        <input type="text" name="password" data-testid="password" onChange={handleChange}></input>
       </div>
 
       <p data-testid="errorMessage" className="error">{error}</p>
+      <button onClick={onSubmit}>Login</button>
+
     </div>
   );
 };
